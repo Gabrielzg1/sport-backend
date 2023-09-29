@@ -37,14 +37,14 @@ class UsuarioController{
 
 
         const { email, password } = req.body;
-        const auth = await Usuario.findOne({email: req.body.emaillogin})  
+        const auth = await Usuario.findOne({email: req.body.email})  
         
         if(!auth){
             return res.status(400).send("Usuario Inexistente")
         }
 
         try{
-            if(auth.senha !== req.body.passwordlogin){
+            if(auth.senha !== req.body.senha){
                 res.send("Senha incorreta!")
             }
             else{
@@ -66,8 +66,8 @@ class UsuarioController{
         }
 
         new Usuario({
-            nome:req.body.name,
-            senha:req.body.password,
+            nome:req.body.nome,
+            senha:req.body.senha,
             email:req.body.email
         }).save().then(()=>{
            return res.status(201).send("Criado com sucesso")

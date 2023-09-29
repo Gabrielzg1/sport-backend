@@ -32,13 +32,13 @@ class AdminController {
 
   async login(req,res){
 
-      const auth =  await Admin.findOne({email: req.body.emailloginadm})
+      const auth =  await Admin.findOne({email: req.body.email})
       if(!auth){
           return res.status(400).send("Admin Inexistente")
       }
 
       try{
-          if(auth.senha != req.body.passwordloginadm){
+          if(auth.senha != req.body.senha){
               res.send("Senha incorreta!")
           }
           else{
@@ -54,19 +54,16 @@ class AdminController {
 
   async register(req,res){
 
-      const { nomeadmin, passwordadmin, emailadmin } = req.body;
-      console.log(emailadmin)
-      console.log(req.body.emailadm)
-      const authuser = await Admin.findOne({email: req.body.emailadm});
+      const authuser = await Admin.findOne({email: req.body.email});
 
       if(authuser){
           return res.status(400).send("Email de Admin ja existente")
       }
 
       new Admin({
-          nome:req.body.nameadm,
-          senha:req.body.passwordadm,
-          email:req.body.emailadm
+          nome:req.body.nome,
+          senha:req.body.senha,
+          email:req.body.email
       }).save().then(()=>{
           res.status(201).send("Criado com sucesso")
       }).catch((err)=>{

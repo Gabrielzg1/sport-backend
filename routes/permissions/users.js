@@ -10,5 +10,4 @@ router.post("/login", controller.login)
 
 router.delete("/:id", controller.delete)
 
-
 module.exports = router;
