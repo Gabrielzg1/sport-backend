@@ -1,9 +1,14 @@
+const express = require("express")
+const router =express.Router()
 const controller = require("../../controllers/permissions/admins");
-const router = require("express").Router();
 
-router.get("/", controller.index);
-router.get("/:adminId", controller.show);
-router.post("/", controller.create);
-router.post("/login", controller.login);
 
-module.exports = router;
+router.get("/", controller.showall)
+router.get("/:id", controller.showid)
+
+router.post("/", controller.register)
+router.post("/login", controller.login)
+
+router.delete("/:id", controller.delete)
+
+module.exports = router

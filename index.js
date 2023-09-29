@@ -5,6 +5,8 @@ const mongo = require("./util/mongo");
 const app = express();
 const port = 2020;
 const cors = require("cors");
+
+
 app.use(cors());
 
 app.use(bodyparser.json());
@@ -17,7 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello World</h1><h2>API DO PROJETO - GRUPO 3- teste</h2>");
+  res.send("<h1>Hello World</h1><h2>API DO PROJETO teste</h2>");
 });
 
 app.get("/teste", (req, res) => {

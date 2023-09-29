@@ -1,57 +1,101 @@
 const Admin = require("../../models/permissions/admin");
 
 class AdminController {
-  async index(req, res) {
-    try {
-      const admins = await Admin.find();
-      return res.json(admins).status(200);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
+  async showall(req,res){
+
+      try{
+          const auth = await Admin.find();
+          return res.json(auth).status(200);
+      }
+      catch(err){
+          res.status(500).send(err)
+      }
   }
 
-  async show(req, res) {
-    try {
-      const { id } = req.body;
-      const admin = await Admin.findById(id);
-      if (!admin) return res.status(404).json({ msg: "Admin not found" });
-      return res.json(admin);
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async create(req, res) {
-    try {
-      const { username, email, password } = req.body;
-      const newAdmin = await Admin.create({
-        username,
-        email,
-        password,
-      });
+  async showid(req,res){
 
-      return res.status(201).json(newAdmin);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      const admin = await Admin.findOne({ email });
-      if (!admin)
-        return res.json({ msg: "Email ou senha incorreto" }).status(404);
+      try{
+          const {id}= req.params;
+          const auth = await Admin.findById(id);
 
-      if (admin.password !== password)
-        return res.json({ msg: "Email ou senha incorreto" }).status(404);
+          if(auth!=null){
+              return res.json(auth).status(200);
+          }
+          else{
+              return res.status(400).send("Admin Inexistente")
+          }
+      }
+      catch(err){
+          res.status(500).send(err)
+      }
+}
 
-      return res.json({ msg: true, id: admin.id }).status(200);
-    } catch (error) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
+  async login(req,res){
+
+      const auth =  await Admin.findOne({email: req.body.emailloginadm})
+      if(!auth){
+          return res.status(400).send("Admin Inexistente")
+      }
+
+      try{
+          if(auth.senha != req.body.passwordloginadm){
+              res.send("Senha incorreta!")
+          }
+          else{
+              res.send("Logado com sucesso")
+          }
+
+      }
+      catch(error){
+          res.status(500).send("Erro: "+ error)
+      }
+
+}
+
+  async register(req,res){
+
+      const { nomeadmin, passwordadmin, emailadmin } = req.body;
+      console.log(emailadmin)
+      console.log(req.body.emailadm)
+      const authuser = await Admin.findOne({email: req.body.emailadm});
+
+      if(authuser){
+          return res.status(400).send("Email de Admin ja existente")
+      }
+
+      new Admin({
+          nome:req.body.nameadm,
+          senha:req.body.passwordadm,
+          email:req.body.emailadm
+      }).save().then(()=>{
+          res.status(201).send("Criado com sucesso")
+      }).catch((err)=>{
+          res.send("Erro ao criar Admin "+ err)
+      })
+
   }
+
+  async delete(req,res){
+
+    const {id}= req.params;
+    const authuser = await Admin.findById(id);
+
+    try{
+        if(authuser){
+            await Admin.deleteOne(authuser);
+
+            return res.status(201).json({
+                msg:"FOI"
+            })
+        }
+        else{
+            return res.status(400).send("Admin Inexistente");
+        }
+    }
+    catch(err){
+        return res.status(500).send(err);
+    }
+
+}
 }
 module.exports = new AdminController();

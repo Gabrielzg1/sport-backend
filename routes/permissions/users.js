@@ -1,19 +1,14 @@
+const express = require('express')
+const router = express.Router()
 const controller = require("../../controllers/permissions/users");
-const router = require("express").Router();
 
-router.get("/", controller.index);
-router.get("/:id", controller.show);
-router.post("/", controller.create);
-router.put("/activity/applied/:userId", controller.updateAppliedActivity);
-router.put(
-  "/activity/applied/cancel/:userId",
-  controller.cancelAppliedActivity
-);
-router.put("/activity/finished/:userId", controller.updateFinishedActivity);
-router.put("/activity/disapprove/:userId", controller.updateDisapproveActivity);
+router.get("/", controller.showall)
+router.get("/:id", controller.showid)
 
-router.post("/login", controller.login);
+router.post("/", controller.register)
+router.post("/login", controller.login)
 
-router.delete("/:userId", controller.destroy);
+router.delete("/:id", controller.delete)
+
 
 module.exports = router;
