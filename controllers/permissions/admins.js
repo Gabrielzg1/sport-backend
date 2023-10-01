@@ -1,4 +1,5 @@
 const Admin = require("../../models/permissions/admin");
+const nodemailer = require('nodemailer')
 
 class AdminController {
   async showall(req,res){
@@ -69,6 +70,31 @@ class AdminController {
       }).catch((err)=>{
           res.send("Erro ao criar Admin "+ err)
       })
+
+      const transporter = nodemailer.createTransport({
+        host:"smtp.gmail.com",
+        port:587,
+        secure:false,
+        auth: {
+          user: "gianlucasmantrao@gmail.com", 
+          pass: "",
+        },
+      });
+
+      await transporter.sendMail({
+        from: "teste gianlucasmantrao@gmail.com", 
+        to: req.body.email, 
+        subject: "Confirmação!", 
+        text: "Confirmado",
+      }).then(res=>
+        console.log(res),
+        transporter.close()
+        ).catch(error=>
+            console.log(error),
+            transporter.close() 
+        )
+
+
 
   }
 

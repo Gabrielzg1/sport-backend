@@ -1,5 +1,6 @@
 const express = require("express");
 const Usuario = require("../../models/permissions/user");
+const nodemailer = require('nodemailer')
 
 class UsuarioController {
   async showall(req, res) {
@@ -65,6 +66,31 @@ class UsuarioController {
         console.log(err);
         return res.send("Erro ao criar usuario " + err);
       });
+      
+
+      const transporter = nodemailer.createTransport({
+        host:"smtp.gmail.com",
+        port:587,
+        secure:false,
+        auth: {
+          user: "gianlucasmantrao@gmail.com", 
+          pass: "",
+        },
+      });
+
+      await transporter.sendMail({
+        from: "teste gianlucasmantrao@gmail.com", 
+        to: req.body.email, 
+        subject: "Confirmação!", 
+        text: "Confirmado",
+      }).then(res=>
+        console.log(res),
+        transporter.close()
+        ).catch(error=>
+            console.log(error),
+            transporter.close() 
+        )
+
   }
 
   async delete(req, res) {
