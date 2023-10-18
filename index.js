@@ -29,6 +29,8 @@ app.get("/teste", (req, res) => {
 //Rotas para os CRUDs
 app.use("/admins", require("./routes/permissions/admins"));
 app.use("/users", require("./routes/permissions/users"));
+app.use("/reviews", require("./routes/permissions/reviews"));
+
 
 (async () => {
   try {
