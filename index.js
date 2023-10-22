@@ -6,7 +6,6 @@ const app = express();
 const port = 2020;
 const cors = require("cors");
 
-
 app.use(cors());
 
 app.use(bodyparser.json());
@@ -29,8 +28,7 @@ app.get("/teste", (req, res) => {
 //Rotas para os CRUDs
 app.use("/admins", require("./routes/permissions/admins"));
 app.use("/users", require("./routes/permissions/users"));
-app.use("/reviews", require("./routes/permissions/reviews"));
-
+app.use("/reviews", require("./routes/others/reviews"));
 
 (async () => {
   try {
