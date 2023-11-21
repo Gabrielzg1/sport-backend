@@ -29,6 +29,7 @@ app.get("/teste", (req, res) => {
 app.use("/admins", require("./routes/permissions/admins"));
 app.use("/users", require("./routes/permissions/users"));
 app.use("/reviews", require("./routes/others/reviews"));
+app.use("/suggestions", require("./routes/others/suggestions"));
 app.use("/players", require("./routes/others/players"));
 
 (async () => {
