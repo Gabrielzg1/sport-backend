@@ -6,7 +6,6 @@ Este projeto consiste em uma API backend desenvolvida para suportar um aplicativ
 
 - **Express**: Framework para aplicativos web Node.js, utilizado para criar a API.
 - **Mongoose**: Biblioteca para modelagem de objetos MongoDB, utilizada para interagir com o banco de dados.
-- **Sequelize**: ORM para Node.js, suporta bancos de dados SQL e é utilizado para interagir com tais bancos.
 - **Axios**: Usado para realizar requisições HTTP a outras APIs, se necessário.
 - **Bcrypt**: Biblioteca para ajudar na hash de senhas.
 - **Body-Parser**: Middleware do Express para análise de corpos de requisição entrantes.
@@ -28,9 +27,7 @@ Para executar este projeto, você precisará ter instalado:
 ## Configuração do Ambiente de Desenvolvimento
 
 1. **Clone o Repositório**:
-   ```
-   git clone <url-do-repositorio-backend>
-   ```
+
 2. **Instalação das Dependências**:
    - No diretório do projeto, execute o seguinte comando para instalar as dependências necessárias:
      ```
