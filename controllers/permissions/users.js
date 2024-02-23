@@ -1,199 +1,110 @@
-const User = require("../../models/permissions/user");
+const express = require("express");
+const Usuario = require("../../models/permissions/user");
+const nodemailer = require("nodemailer");
 
-class UsersController {
-  async index(req, res) {
-    try {
-      const users = await User.find();
-      return res.json(users).status(200);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async show(req, res) {
-    try {
-      const { id } = req.params;
-      const user = await User.findById(id);
-      if (!user) return res.status.User(404).json();
-      return res.json(user);
-    } catch (err) {
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email });
-      if (!user) return res.json({ msg: false }).status(404);
+class UsuarioController {
+	async showall(req, res) {
+		try {
+			const auth = await Usuario.find();
+			return res.json(auth).status(200);
+		} catch (err) {
+			res.status(500).send(err);
+		}
+	}
 
-      if (user.password !== password)
-        return res.json({ msg: false }).status(404);
+	async showid(req, res) {
+		try {
+			const { id } = req.params;
+			const auth = await Usuario.findById(id);
 
-      return res.json({ msg: true, id: user.id }).status(200);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
+			if (auth != null) {
+				return res.json(auth).status(200);
+			} else {
+				return res.status(400).send("Usuario Inexistente");
+			}
+		} catch (err) {
+			res.status(500).send(err);
+		}
+	}
 
-  async create(req, res) {
-    try {
-      const { username, email, password } = req.body;
-      const user = await User.findOne({ email });
+	async login(req, res) {
+		const { email, password } = req.body;
+		const auth = await Usuario.findOne({ email: req.body.email });
 
-      if (user) {
-        return res
-          .status(422)
-          .json({ message: `User ${email} alreary exists` });
-      }
+		if (!auth) {
+			return res.status(400).send("Usuario Inexistente");
+		}
 
-      //crypt the password
-      const newUser = await User.create({
-        username: username,
-        email: email,
-        password: password,
-      });
+		try {
+			if (auth.senha !== req.body.senha) {
+				res.send("Senha incorreta!");
+			} else {
+				res.send("Logado com sucesso");
+			}
+		} catch (error) {
+			res.status(500).send("Erro: " + error);
+		}
+	}
 
-      return res.status(201).json(newUser);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const { email, password } = req.body;
+	async register(req, res) {
+		try {
+			const authuser = await Usuario.findOne({ email: req.body.email });
 
-      const user = await User.findById(id);
+			if (authuser) {
+				return res.status(400).send("Email de Usuario ja existente");
+			}
 
-      if (!user) {
-        return res.status(404).json();
-      }
+			const newUser = new Usuario({
+				nome: req.body.nome,
+				senha: req.body.senha, // Considere usar um hash para a senha!
+				email: req.body.email,
+			});
 
-      await user.updateOne({ email, password });
+			await newUser.save();
 
-      return res.status(200).json(user);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async destroy(req, res) {
-    try {
-      const { id } = req.params;
-      const user = await User.findById(id);
-      if (!user) {
-        return res.status(404).json();
-      }
-      await user.deleteOne();
-      return res.status(200).json();
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async updateAppliedActivity(req, res) {
-    try {
-      const { userId } = req.params;
-      const { appliedId, name } = req.body;
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json();
-      }
-      if (
-        user.applied.findIndex(
-          (item) => item.trainingId === appliedId && item.name === name
-        ) !== -1
-      ) {
-        return res.status(422).json({ msg: "Internal server error." });
-      }
+			const transporter = nodemailer.createTransport({
+				host: "smtp.gmail.com",
+				port: 587,
+				secure: false,
+				auth: {
+					user: "gianlucasmantrao@gmail.com", // use variáveis de ambiente!
+					pass: "wvec ruva sjku uokq", // use variáveis de ambiente!
+				},
+			});
 
-      let newApplied = [...user.applied, { trainingId: appliedId, name }];
+			await transporter.sendMail({
+				from: `"Teste" gianlucasmantrao@gmail.com`,
+				to: req.body.email,
+				subject: "Confirmação!",
+				text: "Confirmado",
+			});
 
-      await user.updateOne({ applied: newApplied });
-      return res.json().status(200);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-  async updateFinishedActivity(req, res) {
-    //Rever
-    try {
-      const { userId } = req.params;
-      const { finishedId } = req.body;
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json();
-      }
-      if (user.finished.indexOf(finishedId) !== -1)
-        return res.status(422).json();
-      let newFinished = [].concat(user.finished, finishedId);
+			transporter.close();
+			return res.status(201).send("Criado com sucesso");
+		} catch (err) {
+			console.error(err);
+			return res.status(500).send("Erro ao criar usuario");
+		}
+	}
 
-      await user.updateOne({ finished: newFinished });
-      return res.status(200).json();
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
+	async delete(req, res) {
+		const { id } = req.params;
+		const authuser = await Usuario.findById(id);
 
-  async updateDisapproveActivity(req, res) {
-    try {
-      const { userId } = req.params;
-      const { disapprovedId, name, reason } = req.body;
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json();
-      }
-      if (
-        user.disapprove.findIndex(
-          (item) => item.trainingId === disapprovedId && item.name === name
-        ) !== -1
-      ) {
-        return res.status(422).json({ msg: "Internal server error." });
-      }
+		try {
+			if (authuser) {
+				await Usuario.deleteOne(authuser);
 
-      let newDisapprove = [
-        ...user.disapprove,
-        { trainingId: disapprovedId, name, reason },
-      ];
-
-      // Salvando as alterações
-      await user.updateOne({ disapprove: newDisapprove });
-      return res.status(200).json();
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
-
-  async cancelAppliedActivity(req, res) {
-    try {
-      const { userId } = req.params;
-      const { appliedId, name } = req.body;
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json();
-      }
-
-      const existingIndex = user.applied.findIndex(
-        (item) => item.trainingId === appliedId && item.name === name
-      );
-      if (existingIndex === -1) {
-        return res.status(422).json({ msg: "Internal server error." });
-      }
-
-      let newApplied = [...user.applied];
-      newApplied.splice(existingIndex, 1);
-
-      await user.updateOne({ applied: newApplied });
-      return res.json().status(200);
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Internal server error." });
-    }
-  }
+				return res.status(201).json({
+					msg: "FOI",
+				});
+			} else {
+				return res.status(400).send("Usuario Inexistente");
+			}
+		} catch (err) {
+			return res.status(500).send(err);
+		}
+	}
 }
-module.exports = new UsersController();
+
+module.exports = new UsuarioController();

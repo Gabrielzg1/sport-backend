@@ -5,6 +5,7 @@ const mongo = require("./util/mongo");
 const app = express();
 const port = 2020;
 const cors = require("cors");
+
 app.use(cors());
 
 app.use(bodyparser.json());
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello World</h1><h2>API DO PROJETO - GRUPO 3- teste</h2>");
+  res.send("<h1>Hello World</h1><h2>API DO PROJETO teste</h2>");
 });
 
 app.get("/teste", (req, res) => {
@@ -27,6 +28,9 @@ app.get("/teste", (req, res) => {
 //Rotas para os CRUDs
 app.use("/admins", require("./routes/permissions/admins"));
 app.use("/users", require("./routes/permissions/users"));
+app.use("/reviews", require("./routes/others/reviews"));
+app.use("/suggestions", require("./routes/others/suggestions"));
+app.use("/players", require("./routes/others/players"));
 
 (async () => {
   try {
